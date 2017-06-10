@@ -1,0 +1,135 @@
+<?php
+/**
+ *       Filename:  phone.php
+ *    Description:
+ *         Author:  liuyoubin@happyplaygame.net
+ *        Created:  2017年3月31日 下午4:37:30
+ *     Copyright (c) 2017, happyplaygame.net All Rights Reserved
+ */
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>注册帐号</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.6 -->
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/assets/plugins/font-awesome/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="/assets/plugins/ionicons/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="/assets/dist/css/AdminLTE.min.css">
+    <!-- AdminLTE Skins. Choose a skin from the css/skins
+         folder instead of downloading all of them to reduce the load. -->
+    <link rel="stylesheet" href="/assets/dist/css/skins/_all-skins.min.css">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="/assets/plugins/iCheck/flat/blue.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- jQuery 2.2.3 -->
+    <script src="/assets/plugins/jQuery/jquery-2.2.3.min.js"></script>
+    <!-- jQuery UI 1.11.4 -->
+    <script src="/assets/plugins/jQueryUI/jquery-ui.min.js"></script>
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <script>
+        $.widget.bridge('uibutton', $.ui.button);
+    </script>
+    <!-- Bootstrap 3.3.6 -->
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+</head>
+<body class="hold-transition login-page am-login-box">
+<div class="login-box">
+    <div class="login-logo" style="display: none;">
+        <b>注册帐号</b>
+    </div>
+    <!-- /.login-logo -->
+    <div class="login-box-body am-loginboxbody">
+        <div class="am-img-head"><img src="images/font_head.png"></div>
+    <p class="login-box-msg" id="msg" style="color: red"></p>
+    <div class="form-group has-feedback">
+        <div class="am-service-num"></div>
+        <marquee> <?php echo $desc;?> </marquee>
+    </div>
+        <div class="am-bottom-back">
+            <div class="form-group has-feedback">
+                <span class="am-title">手机号</span>
+                <input type="text" class="form-control" id="phone" placeholder="手机号">
+            </div>
+            <div class="form-group has-feedback am-button-one">
+                <button type="button" class="btn btn-primary " id="btnSend">发送短信</button>
+            </div>
+            <div class="form-group has-feedback">
+                <span class="am-title">短信验证码</span>
+                <input type="text" class="form-control" id="code" value=""  placeholder="短信验证码">
+            </div>
+
+            <input type="hidden" id="openid" value="<?php echo $openid;?>">
+            <div class="row">
+                <!-- /.col -->
+                <div class="col-xs-4 am-col-button">
+                    <input type="hidden" id="key" value="<?php echo $key;?>">
+                    <button type="button" id="btnSubmit" class="btn btn-primary btn-block btn-flat">提交</button>
+                </div>
+                <!-- /.col -->
+            </div>
+
+
+        </div>
+
+
+</div>
+<!-- /.login-box-body -->
+</div>
+<!-- /.login-box -->
+
+<script type="text/javascript">
+    $("#btnSend").click(function () {
+        phone = $("#phone").val();
+        key = $("#key").val();
+        openid = $("#openid").val();
+        if (phone == "" || key == "") {
+            alert("请输入手机号");
+            return;
+        }
+
+        $("#btnSend").attr("disabled", "disabled");
+        $.post("/code/send", {phone: phone, key: key, openid: openid}, function (data) {
+            if (data.errno != 0) {
+                alert(data.errmsg);
+                return;
+            }
+
+            alert("发送成功");
+
+        });
+    });
+
+    $("#btnSubmit").click(function () {
+
+        phone = $("#phone").val();
+        openid = $("#openid").val();
+        key = $("#key").val();
+        code = $("#code").val();
+
+
+        $.post("/phone", {phone: phone, key: key, openid: openid, code: code}, function (data) {
+            if (data.errno != 0) {
+                $("#msg").html(data.errmsg);
+                return;
+            }
+            window.location.href = "<?php echo ApiConfig::getWeiXinCallbackByHost()?>";
+        });
+    });
+</script>
+</body>
+</html>
